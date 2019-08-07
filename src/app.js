@@ -5,6 +5,7 @@ const winston = require('winston')
 const cors = require('cors')
 const helmet = require('helmet')
 const uuid = require('uuid/v4')
+const cardRouter = require('./card/cardRouter')
 const { NODE_ENV } = require('./config')
 
 
@@ -14,11 +15,11 @@ const morganOption = (NODE_ENV === 'production')
   ? 'tiny'
   : 'common';
 
-  const cards = [{
-    id: 1,
-    title: 'Task One',
-    content: 'This is card one'
-  }]
+  // const cards = [{
+  //   id: 1,
+  //   title: 'Task One',
+  //   content: 'This is card one'
+  // }]
   const lists = [{
     id: 1,
     header: 'List One',
@@ -60,29 +61,31 @@ app.use(function validateBearerToken(req, res, next){
   next()
 })
 
-app.get('/', (req, res) => {
-  res.send('Hello, world!')
-})
+app.use(cardRouter)
 
-app.get('/cards', (req, res) => {
-  res.json(cards)
-})
+// app.get('/', (req, res) => {
+//   res.send('Hello, world!')
+// })
+
+// // app.get('/card', (req, res) => {
+// //   res.json(cards)
+// // })
 
 app.get('/list', (req, res) => {
   res.json(lists)
 })
 
-app.get('/card/:id', (req, res) => {
-  const { id } = req.params
-  const card = cards.find(c => c.id == id)
+// app.get('/card/:id', (req, res) => {
+//   const { id } = req.params
+//   const card = cards.find(c => c.id == id)
 
-  if(!card){
-    logger.error(`Card with id ${id} not found`)
-    return res.status(404).send('Card not found')
-  }
+//   if(!card){
+//     logger.error(`Card with id ${id} not found`)
+//     return res.status(404).send('Card not found')
+//   }
 
-  res.json(card)
-})
+//   res.json(card)
+// })
 
 app.get('/list/:id', (req, res) => {
   const { id } = req.params
@@ -96,32 +99,32 @@ app.get('/list/:id', (req, res) => {
   res.json(list)
 })
 
-app.post('/card', (req, res) => {
-  const { title, content } = req.body
+// app.post('/card', (req, res) => {
+//   const { title, content } = req.body
 
-  if (!title){
-    logger.error('Title is required')
-    return res.status(400).send('Invalid data')
-  }
+//   if (!title){
+//     logger.error('Title is required')
+//     return res.status(400).send('Invalid data')
+//   }
 
-  if (!content){
-    logger.error('Content is required')
-    return res.status(400).send('Invalid data')
-  }
+//   if (!content){
+//     logger.error('Content is required')
+//     return res.status(400).send('Invalid data')
+//   }
 
-  const id = uuid()
+//   const id = uuid()
 
-  const newCard = {
-    id,
-    title,
-    content
-  }
+//   const newCard = {
+//     id,
+//     title,
+//     content
+//   }
 
-  cards.push(newCard)
+//   cards.push(newCard)
 
-  logger.info(`Card with id ${id} created`)
-  res.status(201).location(`http://localhost:8000/card/${id}`).json(newCard)
-})
+//   logger.info(`Card with id ${id} created`)
+//   res.status(201).location(`http://localhost:8000/card/${id}`).json(newCard)
+// })
 
 app.post('/list', (req, res) => {
   const { header, cardIds = [] } = req.body
@@ -159,26 +162,26 @@ app.delete('/list/:id', (req, res) => {
   res.status(204).end()
 })
 
-app.delete('/card/:id', (req, res) => {
-  const { id } = req.params
+// app.delete('/card/:id', (req, res) => {
+//   const { id } = req.params
 
-  const cardIndex = cards.findIndex(c => c.id == id)
+//   const cardIndex = cards.findIndex(c => c.id == id)
 
-  if (cardIndex === -1){
-    logger.error(`Card with id ${id} not found`)
-    return res.status(404).send('Not found')
-  }
+//   if (cardIndex === -1){
+//     logger.error(`Card with id ${id} not found`)
+//     return res.status(404).send('Not found')
+//   }
 
-  lists.forEach(list => {
-    const cardIds = list.cardIds.filter(cid => cid !== id)
-    list.cardIds = cardIds
+//   lists.forEach(list => {
+//     const cardIds = list.cardIds.filter(cid => cid !== id)
+//     list.cardIds = cardIds
 
-    cards.splice(cardIndex, 1)
-    logger.info(`Card with id ${id} deleted`)
+//     cards.splice(cardIndex, 1)
+//     logger.info(`Card with id ${id} deleted`)
 
-    res.status(204).end
-  })
-})
+//     res.status(204).end
+//   })
+// })
 
 
 app.use(function errorHandler(error, req, res, next){
@@ -191,5 +194,6 @@ app.use(function errorHandler(error, req, res, next){
   }
   res.status(500).json(response)
 })
+
 
 module.exports = app
