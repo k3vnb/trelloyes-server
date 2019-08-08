@@ -1,14 +1,16 @@
 const express = require('express')
 const uuid = require('uuid/v4')
+const logger = require('../logger')
+const { cards, lists } = require('../store')
 
 const cardRouter = express.Router()
 const bodyParser = express.json()
 
-const cards = [{
-    id: 1,
-    title: 'Task One',
-    content: 'This is card one'
-  }]
+// const cards = [{
+//     id: 1,
+//     title: 'Task One',
+//     content: 'This is card one'
+//   }]
 
 cardRouter
     .route('/card')
